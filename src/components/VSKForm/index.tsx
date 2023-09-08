@@ -162,7 +162,7 @@ export default function VSKForm() {
                         <p>To get to the next level, improve on the following items: </p>
                         {findImprovementAreas()}
                         <div style={{ margin: '1rem 0rem 2rem 0rem', fontSize: '1.5rem' }}>
-                            <PDFDownloadLink document={<DownloadableDoc />} fileName="somename.pdf">
+                            <PDFDownloadLink document={<DownloadableDoc />} fileName={`${formState.name}_${formState.organization}.pdf`}>
                                 {({ blob, url, loading, error }) =>
                                     loading ? 'Loading document...' : 'Download Report'
                                 }
