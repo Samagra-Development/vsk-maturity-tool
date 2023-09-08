@@ -1,13 +1,14 @@
 import styles from './index.module.scss'
 import { Form, Input, Button, Select } from 'semantic-ui-react'
 import { useEffect, useState } from 'react'
-import { getQuestions } from '@/xhr/api';
+import { getQuestions, saveToHasura } from '@/xhr/api';
 //@ts-ignore
 import Lottie from 'react-lottie';
 //@ts-ignore
 import * as confetti from 'public/lottie/confetti.json';
 import CommonModal from '../CommonModal'
 import { Table } from 'semantic-ui-react'
+import useMobile from '@/hooks/useMobile';
 
 const MATURITY_INDEX: any = {
     'Starter': 0,
@@ -24,6 +25,7 @@ export default function VSKForm() {
     const [maturityLevel, setMaturityLevel] = useState<any>(null);
     let tempQuestionsMap: any = {};
     const [questionsMap, setQuestionsMap] = useState<any>({});
+    const isMobile = useMobile();
 
     // Lottie Options
     const defaultOptions = {
@@ -60,6 +62,8 @@ export default function VSKForm() {
             }
         })
 
+        // Submitting Data to Hasura
+        saveToHasura(formState, finalMaturity[1]);
         setQuestionsMap(tempQuestionsMap)
         setMaturityLevel(finalMaturity[1])
     }
@@ -112,9 +116,12 @@ export default function VSKForm() {
             {maturityLevel ?
                 <CommonModal>
                     <div className={styles.matContainer}>
-                        <Lottie options={defaultOptions}
-                            height={300}
-                            width={300} />
+                        <div>
+                            <Lottie options={defaultOptions}
+                                height={isMobile ? 200 : 400}
+                                width={isMobile ? 200 : 400}
+                            />
+                        </div>
                         <p>Your Maturity Level is </p>
                         <p className={styles[maturityLevel]}>{maturityLevel}</p>
                         <p>To get to the next level, improve on the following items: </p>
@@ -126,6 +133,7 @@ export default function VSKForm() {
                 <Form onSubmit={handleSubmit} size={'large'}>
                     <Form.Group widths='equal'>
                         <Form.Field
+                            required
                             id='form-input-control-name'
                             control={Input}
                             label='Name'
@@ -135,6 +143,7 @@ export default function VSKForm() {
                             }}
                         />
                         <Form.Field
+                            required
                             id='form-input-control-error-email'
                             control={Input}
                             label='Email'
@@ -147,6 +156,7 @@ export default function VSKForm() {
                     </Form.Group>
                     <Form.Group widths='equal'>
                         <Form.Field
+                            required
                             id='form-input-control-mobile'
                             control={Input}
                             label='Mobile'
@@ -159,6 +169,7 @@ export default function VSKForm() {
                             }}
                         />
                         <Form.Field
+                            required
                             id='form-input-control-organization'
                             control={Input}
                             label='State/UT/Organization'
@@ -177,6 +188,7 @@ export default function VSKForm() {
                                     tempState[q.question] = "";
                                     tempQuestionsMap[q.question] = q.vsk_question_options
                                     return <Form.Field
+                                        required
                                         key={q.question_id}
                                         id={`form-input-control-${q?.question_id}`}
                                         control={Select}
@@ -198,6 +210,7 @@ export default function VSKForm() {
                         id='form-button-control-public'
                         control={Button}
                         size={'large'}
+                        color={'primary'}
                         content='Check Maturity'
                     />
                 </Form>
