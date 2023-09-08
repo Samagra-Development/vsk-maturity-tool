@@ -10,6 +10,8 @@ import CommonModal from '../CommonModal'
 import { Table } from 'semantic-ui-react'
 import useMobile from '@/hooks/useMobile';
 import EmailValidator from 'email-validator';
+import { Page, Text, View, Document, PDFDownloadLink } from '@react-pdf/renderer';
+import { pdfStyles } from './pdfStyleSheet';
 
 const MATURITY_INDEX: any = {
     'Starter': 0,
@@ -112,7 +114,37 @@ export default function VSKForm() {
         </Table>
     }
 
-    console.log(tempState)
+    const DownloadableDoc = () => {
+        return <Document>
+            <Page>
+                <View style={pdfStyles.container}>
+                    <Text style={pdfStyles.heading}><Text style={pdfStyles.blueText}>VSK</Text> Maturity Tool Report</Text>
+                    <View style={pdfStyles.info}>
+                        <Text>Name: {formState.name}</Text>
+                        <Text>Email: {formState.email}</Text>
+                        <Text>Mobile: {formState.mobile}</Text>
+                        <Text>Organization: {formState.organization}</Text>
+                    </View>
+                    <View style={pdfStyles.tableContainer}>
+                        <View style={pdfStyles.tableHeader}>
+                            <View style={pdfStyles.t1}><Text>Questions</Text></View>
+                            <View style={pdfStyles.t2}><Text>Selected Option</Text></View>
+                            <View style={pdfStyles.t3}><Text>Maturity Level</Text></View>
+                        </View>
+                        {Object.keys(formState)?.map(el => {
+                            if (!['name', 'email', 'mobile', 'organization'].includes(el))
+                                return <View style={pdfStyles.tableRow} key={el}>
+                                    <View style={pdfStyles.t1}><Text>{el}</Text></View>
+                                    <View style={pdfStyles.t2}><Text>{formState[el].split("_")[0]}</Text></View>
+                                    <View style={pdfStyles.t3}><Text>{formState[el].split("_")[1]}</Text></View>
+                                </View>
+                        })}
+                    </View>
+                    <Text style={pdfStyles.maturityLevel}>Final Calculated Maturity: <Text style={pdfStyles.matText}>{maturityLevel}</Text></Text>
+                </View>
+            </Page>
+        </Document>
+    }
 
     return (
         <>
@@ -121,15 +153,22 @@ export default function VSKForm() {
                     <div className={styles.matContainer}>
                         <div>
                             <Lottie options={defaultOptions}
-                                height={isMobile ? 200 : 400}
-                                width={isMobile ? 200 : 400}
+                                height={isMobile ? 200 : 300}
+                                width={isMobile ? 200 : 300}
                             />
                         </div>
                         <p>Your Maturity Level is </p>
                         <p className={styles[maturityLevel]}>{maturityLevel}</p>
                         <p>To get to the next level, improve on the following items: </p>
                         {findImprovementAreas()}
-                        <Button primary size='large' onClick={() => resetState()}>Done</Button>
+                        <div style={{ margin: '1rem 0rem 2rem 0rem', fontSize: '1.5rem' }}>
+                            <PDFDownloadLink document={<DownloadableDoc />} fileName="somename.pdf">
+                                {({ blob, url, loading, error }) =>
+                                    loading ? 'Loading document...' : 'Download Report'
+                                }
+                            </PDFDownloadLink>
+                        </div>
+                        <Button primary size='large' onClick={() => resetState()}>Close</Button>
                     </div>
                 </CommonModal>
                 :
