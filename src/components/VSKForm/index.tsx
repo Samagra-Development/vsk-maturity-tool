@@ -9,6 +9,7 @@ import * as confetti from 'public/lottie/confetti.json';
 import CommonModal from '../CommonModal'
 import { Table } from 'semantic-ui-react'
 import useMobile from '@/hooks/useMobile';
+import EmailValidator from 'email-validator';
 
 const MATURITY_INDEX: any = {
     'Starter': 0,
@@ -26,6 +27,8 @@ export default function VSKForm() {
     let tempQuestionsMap: any = {};
     const [questionsMap, setQuestionsMap] = useState<any>({});
     const isMobile = useMobile();
+    const [validEmail, validateEmail] = useState(true);
+    const [validMobile, validateMobile] = useState(true);
 
     // Lottie Options
     const defaultOptions = {
@@ -147,9 +150,12 @@ export default function VSKForm() {
                             id='form-input-control-error-email'
                             control={Input}
                             label='Email'
-                            onChange={(e: any) => (setFormState((prevState: any) => ({ ...prevState, email: e.target.value })))}
+                            onChange={(e: any) => {
+                                setFormState((prevState: any) => ({ ...prevState, email: e.target.value }))
+                                validateEmail(EmailValidator.validate(e.target.value));
+                            }}
                             placeholder='janedoe@gmail.com'
-                            error={!formErrors['email'] ? false : {
+                            error={(!formErrors['email'] && validEmail) ? false : {
                                 content: 'Please enter a valid email',
                             }}
                         />
@@ -160,11 +166,14 @@ export default function VSKForm() {
                             id='form-input-control-mobile'
                             control={Input}
                             label='Mobile'
-                            onChange={(e: any) => (setFormState((prevState: any) => ({ ...prevState, mobile: e.target.value })))}
+                            onChange={(e: any) => {
+                                setFormState((prevState: any) => ({ ...prevState, mobile: e.target.value }))
+                                validateMobile(e.target.value.length == 10)
+                            }}
                             placeholder='Mobile'
                             type='number'
                             maxLength={10}
-                            error={(!formErrors['mobile'] && tempState?.mobile?.length != 10) ? false : {
+                            error={(!formErrors['mobile'] && validMobile) ? false : {
                                 content: 'Please enter a valid mobile',
                             }}
                         />
